@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Velocity Visions</title>
+  <style>
+      *{
+          margin: 0;
+          padding: 0;
+          font-family: sans-serif;
+      }
+      .navbar{
+        width: 80%;
+        margin: auto;
+        padding: 0px 50;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .navbar ul li{
+    list-style: none;
+    display: inline-block;
+    padding: 0 30px;
+    position: relative;
+}
+.navbar ul li a{
+    text-decoration: none;
+    color: white;
+    text-transform: uppercase;
+    
+}
+.navbar ul li::after{
+    content: ' ';
+    height: 3px;
+    width: 0;
+    background: #F11A7B;
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    transition: 0.5s;
+}
+.navbar ul li:hover::after{
+    width: 100%;
+}
+.banner{
+    width: 100%;
+    height: 100vh; 
+    background-image: linear-gradient(rgba(0,0,0,0.75),rgba(0,0,0,0.75)), url(images/background.jpg);
+    background-size: cover;
+    background-position: center;
+}
+.logo{
+    width: 200px;
+    margin-right: 50px;
+    margin-left: 50px;
+    cursor: pointer;
+}
+.text-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+}
+button{
+    box-shadow: 0 0 5px #F11A7B,
+    0 0 25px #F11A7B;
+    width: 150px;
+    padding: 10px 5px;
+    text-align: center;
+    margin: 10px 5px;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 2px solid #F11A7B;
+    background: #F11A7B;
+    color: #fff;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+button:hover{
+    box-shadow: 0 0 5px #F11A7B,
+    0 0 25px #F11A7B, 0 0 50px #F11A7B,
+    0 0 100px #F11A7B, 0 0 200px #F11A7B;
+}
+.text-box {
+    background-color: #3498db;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #fff;
+    font-family: Arial, sans-serif;
+    width: 300px;
+}
+input {
+  width: 20%;
+  padding: 5px;
+  font-size: 16px;
+  border: 2px solid #F11A7B;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+  margin-bottom: 10px;
+}
+  </style>
+</head>
+<body>
+    <div class="banner">
+        <div class="navbar">
+            <img src="images/logo.png" class="logo">
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Tracker</a></li>
+                <li><a href="#">Phone</a></li>
+                <li><a href="#">FAQs</a></li>
+            </ul>
+        </div>
+                <div class="text-container">
+  <h1>Cars List</h1>
+  <h2>Add Car Data</h2>
+  <label for="carName">Mileage:</label>
+  <input type="text" id="carName" placeholder="Enter Mileage">
+  <label for="carPrice">Price</label>
+  <input type="text" id="carPrice" placeholder="Enter Price"> 
+  <label for="carModel">Model</label>
+  <input type="text" id="carModel" placeholder="Enter Model">
+  <label for="carCategory">Brand:</label>
+  <input type="text" id="carCategory" placeholder="e.g., Toyota">
+  <button onclick="addCarToList()">Add Car</button>
+  <h2>Car List</h2>
+  <div id="carListOutput"></div>
+
+  <h2>Sort Cars</h2>
+  <button onclick="sortCarList()">Sort Cars</button>
+  <div id="sortedCarOutput"></div>
+
+  <h2>Search Cars by Category</h2>
+  <label for="searchCategory">Enter a Category to Search:</label>
+  <input type="text" id="searchCategory">
+  <button onclick="searchCarByCategory()">Search</button>
+  <div id="searchCategoryOutput"></div>
+  
+<script>
+    // Linked List implementation
+    class Node {
+      constructor(data) {
+        this.data = data;
+        this.next = null;
+      }
+    }
+
+    class LinkedList {
+      constructor() {
+        this.head = null;
+      }
+
+      addToTail(data) {
+        const newNode = new Node(data);
+        if (!this.head) {
+          this.head = newNode;
+        } else {
+          let current = this.head;
+          while (current.next) {
+            current = current.next;
+          }
+          current.next = newNode;
+        }
+      }
+
+      printList() {
+        let current = this.head;
+        let output = '';
+        while (current) {
+          output += current.data.name + ' (' + current.data.category + ')' + ' -> ';
+          current = current.next;
+        }
+        output += 'null';
+        document.getElementById('carListOutput').innerText = output;
+      }
+
+      sortList() {
+        let current = this.head;
+        let listArray = [];
+        while (current) {
+          listArray.push(current.data);
+          current = current.next;
+        }
+        listArray.sort((a, b) => a.name.localeCompare(b.name));
+        this.head = null;
+        listArray.forEach((car) => {
+          this.addToTail(car);
+        });
+      }
+
+      searchByCategory(category) {
+        let current = this.head;
+        let foundCars = [];
+        while (current) {
+          if (current.data.category.toLowerCase().includes(category.toLowerCase())) {
+            foundCars.push(current.data);
+          }
+          current = current.next;
+        }
+        return foundCars;
+      }
+    }
+
+    let carLinkedList = new LinkedList();
+
+    function addCarToList() {
+      const carName = document.getElementById('carName').value;
+      const carCategory = document.getElementById('carCategory').value;
+      if (carName !== '' && carCategory !== '') {
+        const car = { name: carName, category: carCategory };
+        carLinkedList.addToTail(car);
+        carLinkedList.printList();
+      }
+    }
+
+    function sortCarList() {
+      carLinkedList.sortList();
+      carLinkedList.printList();
+    }
+
+    function searchCarByCategory() {
+      const searchCategory = document.getElementById('searchCategory').value;
+      if (searchCategory !== '') {
+        const foundCars = carLinkedList.searchByCategory(searchCategory);
+        if (foundCars.length > 0) {
+          const output = foundCars.map((car) => `${car.name} (${car.category})`).join(', ');
+          document.getElementById('searchCategoryOutput').innerText = output;
+        } else {
+          document.getElementById('searchCategoryOutput').innerText = 'No cars found in this category.';
+        }
+      }
+    }
+  </script>
+</body>
+</html>
